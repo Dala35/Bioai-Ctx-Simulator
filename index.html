@@ -11,13 +11,14 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .container {
       background: #fff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      max-width: 450px;
+      max-width: 500px;
       width: 100%;
     }
     h2 {
@@ -34,12 +35,6 @@
       font-weight: bold;
       text-align: center;
     }
-    .relatorio {
-      font-size: 0.9em;
-      margin-top: 10px;
-      color: #555;
-      line-height: 1.4;
-    }
     button {
       margin-top: 20px;
       width: 100%;
@@ -53,6 +48,11 @@
     button:hover {
       background-color: #166c3b;
     }
+    .info {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -62,58 +62,54 @@
     <label><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
     <label><input type="checkbox" id="il6" /> IL-6 em nível baixo</label>
     <label><input type="checkbox" id="il1b" /> IL-1β em nível alto</label>
-    <label><input type="checkbox" id="ifng" /> IFN-γ ativo</label>
-    <label><input type="checkbox" id="il10" /> IL-10 ativo</label>
-    <label><input type="checkbox" id="tgfb" /> TGF-β ativo</label>
-    <label><input type="checkbox" id="mir21" /> microRNA-21 ativo</label>
+    <label><input type="checkbox" id="ifng" /> IFN-γ ativado</label>
+    <label><input type="checkbox" id="il10" /> IL-10 presente</label>
+    <label><input type="checkbox" id="tgfb" /> TGF-β elevado</label>
+    <label><input type="checkbox" id="mirna21" /> microRNA‑21 elevado</label>
     <button onclick="processarSinais()">Processar</button>
     <div class="result" id="resultado"></div>
-    <div class="relatorio" id="relatorio"></div>
-  </div>
-  <script>
+    <div class="info" id="relatorio"></div>
+  </div>  <script>
     function processarSinais() {
-      const hivRNA = document.getElementById("hivRNA").checked;
-      const cd4 = document.getElementById("cd4").checked;
-      const il6 = document.getElementById("il6").checked;
-      const il1b = document.getElementById("il1b").checked;
-      const ifng = document.getElementById("ifng").checked;
-      const il10 = document.getElementById("il10").checked;
-      const tgfb = document.getElementById("tgfb").checked;
-      const mir21 = document.getElementById("mir21").checked;const andLogic = hivRNA && cd4 && il6;
-  const norLogic = !il1b;
-  const xorLogic = (ifng || il10) && !(ifng && il10);
-  const nandLogic = !(tgfb && mir21);
+      const sinais = {
+        hivRNA: document.getElementById("hivRNA").checked,
+        cd4: document.getElementById("cd4").checked,
+        il6: document.getElementById("il6").checked,
+        il1b: document.getElementById("il1b").checked,
+        ifng: document.getElementById("ifng").checked,
+        il10: document.getElementById("il10").checked,
+        tgfb: document.getElementById("tgfb").checked,
+        mirna21: document.getElementById("mirna21").checked,
+      };
 
-  const ativarCas12b = andLogic && norLogic && xorLogic && nandLogic;
+      // Lógica BioAI‑CTX
+      const andLogic = sinais.hivRNA && sinais.cd4 && sinais.il6;
+      const norLogic = !(sinais.il1b || sinais.tgfb);
+      const xorLogic = sinais.ifng !== sinais.il10;
+      const nandLogic = !(sinais.mirna21 && sinais.il1b);
 
-  const resultado = document.getElementById("resultado");
-  const relatorio = document.getElementById("relatorio");
+      const ativarCas12b = andLogic && norLogic && xorLogic && nandLogic;
 
-  if (ativarCas12b) {
-    resultado.textContent = "✅ Terapia ativada: Cas12b ON";
-    resultado.style.color = "green";
-    relatorio.innerHTML = `
-      <strong>Relatório:</strong><br>
-      - RNA do HIV, CD4+ e IL-6 presentes (AND) ✔️<br>
-      - IL-1β ausente (NOR) ✔️<br>
-      - Atividade XOR entre IFN-γ e IL-10 ✔️<br>
-      - TGF-β e microRNA-21 não simultaneamente ativos (NAND) ✔️<br>
-      <em>Sistema em conformidade com o modelo BioAI‑CTX.</em>
-    `;
-  } else {
-    resultado.textContent = "⛔ Terapia bloqueada";
-    resultado.style.color = "red";
-    relatorio.innerHTML = `
-      <strong>Relatório:</strong><br>
-      - RNA do HIV, CD4+ e IL-6 presentes (AND): ${andLogic ? '✔️' : '❌'}<br>
-      - IL-1β ausente (NOR): ${norLogic ? '✔️' : '❌'}<br>
-      - IFN-γ XOR IL-10: ${xorLogic ? '✔️' : '❌'}<br>
-      - TGF-β NAND microRNA-21: ${nandLogic ? '✔️' : '❌'}<br>
-      <em>Condições insuficientes para ativação da terapia Cas12b.</em>
-    `;
-  }
-}
+      const resultado = document.getElementById("resultado");
+      const relatorio = document.getElementById("relatorio");
 
-  </script>
-</body>
+      if (ativarCas12b) {
+        resultado.textContent = "✅ Terapia ativada: Cas12b ON";
+        resultado.style.color = "green";
+      } else {
+        resultado.textContent = "⛔ Terapia bloqueada";
+        resultado.style.color = "red";
+      }
+
+      relatorio.innerHTML = `
+        <p><strong>Explicação:</strong></p>
+        <ul>
+          <li>AND (HIV + CD4 + IL6): ${andLogic ? "✔️" : "❌"}</li>
+          <li>NOR (¬IL1β ∧ ¬TGFβ): ${norLogic ? "✔️" : "❌"}</li>
+          <li>XOR (IFNγ ⊕ IL10): ${xorLogic ? "✔️" : "❌"}</li>
+          <li>NAND (¬(microRNA21 ∧ IL1β)): ${nandLogic ? "✔️" : "❌"}</li>
+        </ul>
+      `;
+    }
+  </script></body>
 </html>
