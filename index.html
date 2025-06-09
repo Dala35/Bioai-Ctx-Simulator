@@ -1,115 +1,265 @@
-<!DOCTYPE html><html lang="pt">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulador BioAI‑CTX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador BioAI‑CTX Avançado</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      align-items: flex-start;
+      min-height: 100vh;
     }
     .container {
-      background: #fff;
+      background: white;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 450px;
       width: 100%;
     }
     h2 {
       text-align: center;
-      color: #333;
+      color: #2d2d2d;
+      margin-bottom: 1rem;
     }
     label {
-      display: block;
-      margin: 10px 0 5px;
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
     }
-    .result {
-      margin-top: 20px;
-      font-size: 1.2em;
-      font-weight: bold;
-      text-align: center;
+    label input {
+      margin-right: 10px;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
     }
+    .marker-status {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-left: 8px;
+      border: 1px solid #ccc;
+      vertical-align: middle;
+    }
+    .on { background: #1f8b4c; }
+    .off { background: #bbb; }
     button {
       margin-top: 20px;
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background-color: #1f8b4c;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
     button:hover {
       background-color: #166c3b;
     }
-    .info {
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 10px;
+    .result {
+      margin-top: 20px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-align: center;
+      min-height: 50px;
+    }
+    .report {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      background: #eef6f2;
+      padding: 15px;
+      border-radius: 8px;
+      color: #333;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      .container {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Simulador BioAI‑CTX</h2>
-    <label><input type="checkbox" id="hivRNA" /> RNA do HIV detectado</label>
-    <label><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
-    <label><input type="checkbox" id="il6" /> IL-6 em nível baixo</label>
-    <label><input type="checkbox" id="il1b" /> IL-1β em nível alto</label>
-    <label><input type="checkbox" id="ifng" /> IFN-γ ativado</label>
-    <label><input type="checkbox" id="il10" /> IL-10 presente</label>
-    <label><input type="checkbox" id="tgfb" /> TGF-β elevado</label>
-    <label><input type="checkbox" id="mirna21" /> microRNA‑21 elevado</label>
-    <button onclick="processarSinais()">Processar</button>
-    <div class="result" id="resultado"></div>
-    <div class="info" id="relatorio"></div>
-  </div>  <script>
+  <div class="container" role="main" aria-label="Simulador BioAI‑CTX Avançado">
+    <h2>Simulador BioAI‑CTX Avançado</h2>
+    <form id="simForm" aria-describedby="instructions">
+      <p id="instructions" style="font-size:0.9rem; color:#555; margin-bottom:1rem;">
+        Selecione os marcadores moleculares detectados:
+      </p>
+
+      <label for="hivRNA">
+        <input type="checkbox" id="hivRNA" name="hivRNA" />
+        RNA do HIV detectado
+        <span class="marker-status off" id="status-hivRNA"></span>
+      </label>
+      <label for="cd4">
+        <input type="checkbox" id="cd4" name="cd4" />
+        Células CD4+ presentes
+        <span class="marker-status off" id="status-cd4"></span>
+      </label>
+      <label for="il6">
+        <input type="checkbox" id="il6" name="il6" />
+        IL-6 em nível <strong>baixo</strong>
+        <span class="marker-status off" id="status-il6"></span>
+      </label>
+      <label for="il1b">
+        <input type="checkbox" id="il1b" name="il1b" />
+        IL-1β em nível <strong>alto</strong>
+        <span class="marker-status off" id="status-il1b"></span>
+      </label>
+      <label for="ifng">
+        <input type="checkbox" id="ifng" name="ifng" />
+        IFN-γ presente
+        <span class="marker-status off" id="status-ifng"></span>
+      </label>
+      <label for="il10">
+        <input type="checkbox" id="il10" name="il10" />
+        IL-10 presente
+        <span class="marker-status off" id="status-il10"></span>
+      </label>
+      <label for="tgfb">
+        <input type="checkbox" id="tgfb" name="tgfb" />
+        TGF-β presente
+        <span class="marker-status off" id="status-tgfb"></span>
+      </label>
+      <label for="mir21">
+        <input type="checkbox" id="mir21" name="mir21" />
+        microRNA-21 presente
+        <span class="marker-status off" id="status-mir21"></span>
+      </label>
+
+      <button type="button" onclick="processarSinais()" aria-live="polite">Processar</button>
+    </form>
+
+    <div class="result" id="resultado" role="region" aria-live="polite" aria-atomic="true"></div>
+    <pre class="report" id="relatorio" aria-label="Relatório da simulação"></pre>
+    <button type="button" onclick="exportarPDF()" aria-label="Exportar relatório para PDF">Exportar Relatório PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // Atualiza os círculos de status dos marcadores
+    function atualizarStatus() {
+      const marcadores = ['hivRNA','cd4','il6','il1b','ifng','il10','tgfb','mir21'];
+      marcadores.forEach(id => {
+        const checked = document.getElementById(id).checked;
+        const status = document.getElementById('status-' + id);
+        status.className = 'marker-status ' + (checked ? 'on' : 'off');
+      });
+    }
+
+    // Função principal para processar sinais e ativar a terapia
     function processarSinais() {
-      const sinais = {
-        hivRNA: document.getElementById("hivRNA").checked,
-        cd4: document.getElementById("cd4").checked,
-        il6: document.getElementById("il6").checked,
-        il1b: document.getElementById("il1b").checked,
-        ifng: document.getElementById("ifng").checked,
-        il10: document.getElementById("il10").checked,
-        tgfb: document.getElementById("tgfb").checked,
-        mirna21: document.getElementById("mirna21").checked,
-      };
+      atualizarStatus();
 
-      // Lógica BioAI‑CTX
-      const andLogic = sinais.hivRNA && sinais.cd4 && sinais.il6;
-      const norLogic = !(sinais.il1b || sinais.tgfb);
-      const xorLogic = sinais.ifng !== sinais.il10;
-      const nandLogic = !(sinais.mirna21 && sinais.il1b);
+      // Captura valores dos marcadores
+      const hivRNA = document.getElementById("hivRNA").checked;
+      const cd4 = document.getElementById("cd4").checked;
+      const il6 = document.getElementById("il6").checked;
+      const il1b = document.getElementById("il1b").checked;
+      const ifng = document.getElementById("ifng").checked;
+      const il10 = document.getElementById("il10").checked;
+      const tgfb = document.getElementById("tgfb").checked;
+      const mir21 = document.getElementById("mir21").checked;
 
-      const ativarCas12b = andLogic && norLogic && xorLogic && nandLogic;
+      /*
+      Lógica terapêutica composta:
+      Ativa Cas12b se:
+      (hivRNA AND cd4 AND il6) AND NOT il1b
+      E (IFN-γ XOR IL-10)
+      E NAND(TGF-β, microRNA-21) --> True se não ambos ativos
+      */
 
+      const andBase = hivRNA && cd4 && il6;
+      const notIl1b = !il1b;
+      const xorIfnIl10 = (ifng !== il10);
+      const nandTgfbMir21 = !(tgfb && mir21);
+
+      const ativarCas12b = andBase && notIl1b && xorIfnIl10 && nandTgfbMir21;
+
+      // Mostrar resultado na UI
       const resultado = document.getElementById("resultado");
       const relatorio = document.getElementById("relatorio");
 
       if (ativarCas12b) {
         resultado.textContent = "✅ Terapia ativada: Cas12b ON";
-        resultado.style.color = "green";
+        resultado.style.color = "#1f8b4c";
+        relatorio.textContent = gerarRelatorio({
+          hivRNA, cd4, il6, il1b, ifng, il10, tgfb, mir21,
+          ativarCas12b
+        });
       } else {
         resultado.textContent = "⛔ Terapia bloqueada";
-        resultado.style.color = "red";
+        resultado.style.color = "#c0392b";
+        relatorio.textContent = gerarRelatorio({
+          hivRNA, cd4, il6, il1b, ifng, il10, tgfb, mir21,
+          ativarCas12b
+        });
       }
+    }
 
-      relatorio.innerHTML = `
-        <p><strong>Explicação:</strong></p>
-        <ul>
-          <li>AND (HIV + CD4 + IL6): ${andLogic ? "✔️" : "❌"}</li>
-          <li>NOR (¬IL1β ∧ ¬TGFβ): ${norLogic ? "✔️" : "❌"}</li>
-          <li>XOR (IFNγ ⊕ IL10): ${xorLogic ? "✔️" : "❌"}</li>
-          <li>NAND (¬(microRNA21 ∧ IL1β)): ${nandLogic ? "✔️" : "❌"}</li>
-        </ul>
+    // Geração de relatório explicativo com base nos dados
+    function gerarRelatorio({ hivRNA, cd4, il6, il1b, ifng, il10, tgfb, mir21, ativarCas12b }) {
+      return `
+==== Relatório da Simulação ====
+
+Marcadores Ativos:
+- RNA do HIV: ${hivRNA ? "✔" : "✘"}
+- CD4+: ${cd4 ? "✔" : "✘"}
+- IL-6 baixo: ${il6 ? "✔" : "✘"}
+- IL-1β alto: ${il1b ? "✔" : "✘"}
+- IFN-γ: ${ifng ? "✔" : "✘"}
+- IL-10: ${il10 ? "✔" : "✘"}
+- TGF-β: ${tgfb ? "✔" : "✘"}
+- microRNA-21: ${mir21 ? "✔" : "✘"}
+
+🔬 Análise Lógica:
+- Expressão (hivRNA AND CD4+ AND IL-6): ${hivRNA && cd4 && il6}
+- Negação de IL-1β alto: ${!il1b}
+- IFN-γ XOR IL-10: ${(ifng !== il10)}
+- NAND entre TGF-β e microRNA-21: ${!(tgfb && mir21)}
+
+🧠 Resultado Final:
+${ativarCas12b ? "A Terapia Cas12b foi ATIVADA com sucesso." : "As condições não são favoráveis para ativação terapêutica."}
       `;
     }
-  </script></body>
+
+    // Exportar relatório como PDF
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const texto = document.getElementById("relatorio").textContent;
+      doc.setFont("courier", "normal");
+      doc.setFontSize(10);
+      doc.text(texto, 10, 10, { maxWidth: 180, lineHeightFactor: 1.4 });
+      doc.save("relatorio-simulacao.pdf");
+    }
+
+    // Atualiza visual automaticamente ao marcar
+    document.querySelectorAll("input[type=checkbox]").forEach(el =>
+      el.addEventListener("change", atualizarStatus)
+    );
+
+    // Inicializa status na primeira visita
+    atualizarStatus();
+  </script>
+</body>
 </html>
