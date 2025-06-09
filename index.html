@@ -1,62 +1,53 @@
-    <!DOCTYPE html><html lang="pt">
+    <!DOCTYPE html>
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Simulador BioAI‑CTX</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
+      background: #121212;
+      color: #f4f4f4;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
     .container {
-      background: #fff;
+      background: #1e1e1e;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-      max-width: 500px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      max-width: 420px;
       width: 100%;
     }
     h2 {
       text-align: center;
-      color: #222;
+      color: #00ff99;
     }
     label {
       display: block;
       margin: 10px 0 5px;
-      font-weight: 500;
     }
     .result {
       margin-top: 20px;
-      font-size: 1.1em;
+      font-size: 1.2em;
       font-weight: bold;
       text-align: center;
     }
     button {
-      margin-top: 20px;
+      margin-top: 12px;
       width: 100%;
       padding: 10px;
-      background-color: #1f8b4c;
+      background-color: #00c26e;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 1em;
     }
     button:hover {
-      background-color: #166c3b;
-    }
-    .report {
-      margin-top: 20px;
-      background: #eaeaea;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 0.95em;
-      white-space: pre-wrap;
+      background-color: #00995c;
     }
   </style>
 </head>
@@ -68,40 +59,47 @@
     <label><input type="checkbox" id="il6" /> IL-6 em nível <strong>baixo</strong></label>
     <label><input type="checkbox" id="il1b" /> IL-1β em nível <strong>alto</strong></label>
     <button onclick="processarSinais()">Processar</button>
+    <button onclick="exportarPDF()">Exportar PDF</button>
     <div class="result" id="resultado"></div>
-    <div class="report" id="relatorio"></div>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     function processarSinais() {
       const hivRNA = document.getElementById("hivRNA").checked;
       const cd4 = document.getElementById("cd4").checked;
       const il6 = document.getElementById("il6").checked;
-      const il1b = document.getElementById("il1b").checked;const andLogic = hivRNA && cd4 && il6;
-  const norLogic = !il1b;
-  const ativarCas12b = andLogic && norLogic;
+      const il1b = document.getElementById("il1b").checked;
 
-  const resultado = document.getElementById("resultado");
-  const relatorio = document.getElementById("relatorio");
+      const andLogic = hivRNA && cd4 && il6;
+      const norLogic = !il1b;
+      const ativarCas12b = andLogic && norLogic;
 
-  if (ativarCas12b) {
-    resultado.textContent = "✅ Terapia ativada: Cas12b ON";
-    resultado.style.color = "green";
-  } else {
-    resultado.textContent = "⛔ Terapia bloqueada";
-    resultado.style.color = "red";
-  }
+      const resultado = document.getElementById("resultado");
+      if (ativarCas12b) {
+        resultado.textContent = "✅ Terapia ativada: Cas12b ON";
+        resultado.style.color = "lime";
+      } else {
+        resultado.textContent = "⛔ Terapia bloqueada";
+        resultado.style.color = "red";
+      }
+    }
 
-  const textoRelatorio = `RELATÓRIO DE ANÁLISE:
-  - RNA HIV: ${hivRNA ? "Detectado" : "Não detectado"}
-  - CD4+: ${cd4 ? "Presente" : "Ausente"}
-  - IL-6: ${il6 ? "Baixo" : "Normal/Alto"}
-  - IL-1β: ${il1b ? "Alto" : "Normal/Baixo"}
+    function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const resultado = document.getElementById("resultado").textContent;
 
-  Resultado final: ${ativarCas12b ? "✔ Terapia Cas12b ativada" : "✖ Terapia bloqueada devido à lógica não satisfeita"}`;
+      doc.setFontSize(16);
+      doc.text("Relatório BioAI‑CTX", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Resultado da Simulação: ${resultado}`, 20, 40);
 
-  relatorio.textContent = textoRelatorio;
-}
+      const data = new Date().toLocaleString();
+      doc.text(`Data: ${data}`, 20, 60);
 
+      doc.save("relatorio-bioai-ctx.pdf");
+    }
   </script>
 </body>
-    </html>
+</html>
