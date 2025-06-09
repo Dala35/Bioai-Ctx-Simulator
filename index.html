@@ -2,13 +2,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulador BioAI‑CTX v2.0</title>
+  <title>Simulador BioAI‑CTX</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #1f8b4c, #ffffff);
-      margin: 0;
-      padding: 0;
+      background: #f4f4f4;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -16,89 +14,106 @@
     }
     .container {
       background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      max-width: 500px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 450px;
       width: 100%;
     }
     h2 {
       text-align: center;
-      color: #1f8b4c;
+      color: #333;
     }
     label {
       display: block;
-      margin: 12px 0;
-      font-weight: bold;
-    }
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      margin: 10px 0 5px;
     }
     .result {
-      margin-top: 30px;
+      margin-top: 20px;
       font-size: 1.2em;
       font-weight: bold;
       text-align: center;
     }
+    .relatorio {
+      font-size: 0.9em;
+      margin-top: 10px;
+      color: #555;
+      line-height: 1.4;
+    }
     button {
       margin-top: 20px;
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       background-color: #1f8b4c;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 1em;
     }
     button:hover {
       background-color: #166c3b;
-    }
-    .explanation {
-      font-size: 0.9em;
-      color: #333;
-      margin-top: 10px;
-      text-align: justify;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Simulador BioAI‑CTX</h2><label class="checkbox-group"><input type="checkbox" id="hivRNA" /> RNA do HIV detectado</label>
-<label class="checkbox-group"><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
-<label class="checkbox-group"><input type="checkbox" id="il6" /> IL-6 em nível baixo</label>
-<label class="checkbox-group"><input type="checkbox" id="il1b" /> IL-1β em nível alto</label>
-<label class="checkbox-group"><input type="checkbox" id="tnfa" /> TNF-α em nível alto</label>
-
-<button onclick="processarSinais()">Processar BioSinais</button>
-
-<div class="result" id="resultado"></div>
-<div class="explanation" id="explicacao"></div>
-
-  </div>  <script>
+    <h2>Simulador BioAI‑CTX</h2>
+    <label><input type="checkbox" id="hivRNA" /> RNA do HIV detectado</label>
+    <label><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
+    <label><input type="checkbox" id="il6" /> IL-6 em nível baixo</label>
+    <label><input type="checkbox" id="il1b" /> IL-1β em nível alto</label>
+    <label><input type="checkbox" id="ifng" /> IFN-γ ativo</label>
+    <label><input type="checkbox" id="il10" /> IL-10 ativo</label>
+    <label><input type="checkbox" id="tgfb" /> TGF-β ativo</label>
+    <label><input type="checkbox" id="mir21" /> microRNA-21 ativo</label>
+    <button onclick="processarSinais()">Processar</button>
+    <div class="result" id="resultado"></div>
+    <div class="relatorio" id="relatorio"></div>
+  </div>
+  <script>
     function processarSinais() {
       const hivRNA = document.getElementById("hivRNA").checked;
       const cd4 = document.getElementById("cd4").checked;
       const il6 = document.getElementById("il6").checked;
       const il1b = document.getElementById("il1b").checked;
-      const tnfa = document.getElementById("tnfa").checked;
+      const ifng = document.getElementById("ifng").checked;
+      const il10 = document.getElementById("il10").checked;
+      const tgfb = document.getElementById("tgfb").checked;
+      const mir21 = document.getElementById("mir21").checked;const andLogic = hivRNA && cd4 && il6;
+  const norLogic = !il1b;
+  const xorLogic = (ifng || il10) && !(ifng && il10);
+  const nandLogic = !(tgfb && mir21);
 
-      const ativarCas12b = hivRNA && cd4 && il6 && !il1b && !tnfa;
+  const ativarCas12b = andLogic && norLogic && xorLogic && nandLogic;
 
-      const resultado = document.getElementById("resultado");
-      const explicacao = document.getElementById("explicacao");
+  const resultado = document.getElementById("resultado");
+  const relatorio = document.getElementById("relatorio");
 
-      if (ativarCas12b) {
-        resultado.textContent = "✅ Terapia ativada: Cas12b ON";
-        resultado.style.color = "green";
-        explicacao.textContent = "Condições ideais: RNA viral presente, CD4+ ativos, inflamação sob controle (IL-1β e TNF-α baixos). A BioIA considera o cenário como seguro para resposta editável.";
-      } else {
-        resultado.textContent = "⛔ Terapia bloqueada";
-        resultado.style.color = "red";
-        explicacao.textContent = "A combinação atual de biossinais indica risco de inflamação severa ou ausência de alvo. Ajuste os parâmetros para simular outra resposta.";
-      }
-    }
-  </script></body>
+  if (ativarCas12b) {
+    resultado.textContent = "✅ Terapia ativada: Cas12b ON";
+    resultado.style.color = "green";
+    relatorio.innerHTML = `
+      <strong>Relatório:</strong><br>
+      - RNA do HIV, CD4+ e IL-6 presentes (AND) ✔️<br>
+      - IL-1β ausente (NOR) ✔️<br>
+      - Atividade XOR entre IFN-γ e IL-10 ✔️<br>
+      - TGF-β e microRNA-21 não simultaneamente ativos (NAND) ✔️<br>
+      <em>Sistema em conformidade com o modelo BioAI‑CTX.</em>
+    `;
+  } else {
+    resultado.textContent = "⛔ Terapia bloqueada";
+    resultado.style.color = "red";
+    relatorio.innerHTML = `
+      <strong>Relatório:</strong><br>
+      - RNA do HIV, CD4+ e IL-6 presentes (AND): ${andLogic ? '✔️' : '❌'}<br>
+      - IL-1β ausente (NOR): ${norLogic ? '✔️' : '❌'}<br>
+      - IFN-γ XOR IL-10: ${xorLogic ? '✔️' : '❌'}<br>
+      - TGF-β NAND microRNA-21: ${nandLogic ? '✔️' : '❌'}<br>
+      <em>Condições insuficientes para ativação da terapia Cas12b.</em>
+    `;
+  }
+}
+
+  </script>
+</body>
 </html>
