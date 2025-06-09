@@ -2,11 +2,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulador BioAI‑CTX</title>
+  <title>Simulador BioAI‑CTX v2.0</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: linear-gradient(to right, #1f8b4c, #ffffff);
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -14,22 +16,28 @@
     }
     .container {
       background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      max-width: 500px;
       width: 100%;
     }
     h2 {
       text-align: center;
-      color: #333;
+      color: #1f8b4c;
     }
     label {
       display: block;
-      margin: 10px 0 5px;
+      margin: 12px 0;
+      font-weight: bold;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .result {
-      margin-top: 20px;
+      margin-top: 30px;
       font-size: 1.2em;
       font-weight: bold;
       text-align: center;
@@ -37,26 +45,37 @@
     button {
       margin-top: 20px;
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background-color: #1f8b4c;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 1em;
     }
     button:hover {
       background-color: #166c3b;
+    }
+    .explanation {
+      font-size: 0.9em;
+      color: #333;
+      margin-top: 10px;
+      text-align: justify;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Simulador BioAI‑CTX</h2>
-    <label><input type="checkbox" id="hivRNA" /> RNA do HIV detectado</label>
-    <label><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
-    <label><input type="checkbox" id="il6" /> IL-6 em nível **baixo**</label>
-    <label><input type="checkbox" id="il1b" /> IL-1β em nível **alto**</label><button onclick="processarSinais()">Processar</button>
+    <h2>Simulador BioAI‑CTX</h2><label class="checkbox-group"><input type="checkbox" id="hivRNA" /> RNA do HIV detectado</label>
+<label class="checkbox-group"><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
+<label class="checkbox-group"><input type="checkbox" id="il6" /> IL-6 em nível baixo</label>
+<label class="checkbox-group"><input type="checkbox" id="il1b" /> IL-1β em nível alto</label>
+<label class="checkbox-group"><input type="checkbox" id="tnfa" /> TNF-α em nível alto</label>
+
+<button onclick="processarSinais()">Processar BioSinais</button>
+
 <div class="result" id="resultado"></div>
+<div class="explanation" id="explicacao"></div>
 
   </div>  <script>
     function processarSinais() {
@@ -64,19 +83,21 @@
       const cd4 = document.getElementById("cd4").checked;
       const il6 = document.getElementById("il6").checked;
       const il1b = document.getElementById("il1b").checked;
+      const tnfa = document.getElementById("tnfa").checked;
 
-      const andLogic = hivRNA && cd4 && il6;
-      const norLogic = !il1b;
-
-      const ativarCas12b = andLogic && norLogic;
+      const ativarCas12b = hivRNA && cd4 && il6 && !il1b && !tnfa;
 
       const resultado = document.getElementById("resultado");
+      const explicacao = document.getElementById("explicacao");
+
       if (ativarCas12b) {
         resultado.textContent = "✅ Terapia ativada: Cas12b ON";
         resultado.style.color = "green";
+        explicacao.textContent = "Condições ideais: RNA viral presente, CD4+ ativos, inflamação sob controle (IL-1β e TNF-α baixos). A BioIA considera o cenário como seguro para resposta editável.";
       } else {
         resultado.textContent = "⛔ Terapia bloqueada";
         resultado.style.color = "red";
+        explicacao.textContent = "A combinação atual de biossinais indica risco de inflamação severa ou ausência de alvo. Ajuste os parâmetros para simular outra resposta.";
       }
     }
   </script></body>
