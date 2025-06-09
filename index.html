@@ -1,34 +1,38 @@
-    <!DOCTYPE html>
-<html lang="pt">
+<!DOCTYPE html><html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulador BioAI‑CTX</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #121212;
-      color: #f4f4f4;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      transition: background 0.3s, color 0.3s;
     }
     .container {
-      background: #1e1e1e;
+      background: var(--card);
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-      max-width: 420px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
       width: 100%;
     }
     h2 {
       text-align: center;
-      color: #00ff99;
     }
     label {
       display: block;
       margin: 10px 0 5px;
+    }
+    .tooltip {
+      font-size: 0.8em;
+      color: var(--tooltip);
     }
     .result {
       margin-top: 20px;
@@ -37,17 +41,35 @@
       text-align: center;
     }
     button {
-      margin-top: 12px;
+      margin-top: 20px;
       width: 100%;
       padding: 10px;
-      background-color: #00c26e;
+      background-color: #1f8b4c;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #00995c;
+      background-color: #166c3b;
+    }
+    .theme-toggle {
+      margin-top: 10px;
+      font-size: 0.9em;
+      text-align: center;
+      cursor: pointer;
+    }
+    :root {
+      --bg: #f4f4f4;
+      --card: #fff;
+      --text: #000;
+      --tooltip: #555;
+    }
+    .dark {
+      --bg: #1c1c1c;
+      --card: #2a2a2a;
+      --text: #f4f4f4;
+      --tooltip: #aaa;
     }
   </style>
 </head>
@@ -55,16 +77,31 @@
   <div class="container">
     <h2>Simulador BioAI‑CTX</h2>
     <label><input type="checkbox" id="hivRNA" /> RNA do HIV detectado</label>
-    <label><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
-    <label><input type="checkbox" id="il6" /> IL-6 em nível <strong>baixo</strong></label>
-    <label><input type="checkbox" id="il1b" /> IL-1β em nível <strong>alto</strong></label>
-    <button onclick="processarSinais()">Processar</button>
-    <button onclick="exportarPDF()">Exportar PDF</button>
-    <div class="result" id="resultado"></div>
-  </div>
+    <div class="tooltip">Presença de vírus ativo no organismo.</div><label><input type="checkbox" id="cd4" /> Células CD4+ presentes</label>
+<div class="tooltip">Essenciais para a resposta imune adaptativa.</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
+<label><input type="checkbox" id="il6" /> IL-6 em nível baixo</label>
+<div class="tooltip">Níveis baixos indicam controle inflamatório.</div>
+
+<label><input type="checkbox" id="il1b" /> IL-1β em nível alto</label>
+<div class="tooltip">Níveis altos indicam inflamação intensa.</div>
+
+<button onclick="processarSinais()">Processar</button>
+<div class="result" id="resultado"></div>
+<div id="historico"></div>
+
+<button onclick="baixarImagem()">📤 Exportar como Imagem</button>
+<button onclick="compartilharWhatsApp()">📱 Compartilhar no WhatsApp</button>
+
+<div class="theme-toggle" onclick="alternarTema()">🌓 Alternar tema</div>
+
+  </div>  <script>
+    let modoEscuro = false;
+    function alternarTema() {
+      modoEscuro = !modoEscuro;
+      document.body.className = modoEscuro ? 'dark' : '';
+    }
+
     function processarSinais() {
       const hivRNA = document.getElementById("hivRNA").checked;
       const cd4 = document.getElementById("cd4").checked;
@@ -78,28 +115,40 @@
       const resultado = document.getElementById("resultado");
       if (ativarCas12b) {
         resultado.textContent = "✅ Terapia ativada: Cas12b ON";
-        resultado.style.color = "lime";
+        resultado.style.color = "green";
       } else {
         resultado.textContent = "⛔ Terapia bloqueada";
         resultado.style.color = "red";
       }
+
+      registrarHistorico(resultado.textContent);
     }
 
-    function exportarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const resultado = document.getElementById("resultado").textContent;
-
-      doc.setFontSize(16);
-      doc.text("Relatório BioAI‑CTX", 20, 20);
-      doc.setFontSize(12);
-      doc.text(`Resultado da Simulação: ${resultado}`, 20, 40);
-
-      const data = new Date().toLocaleString();
-      doc.text(`Data: ${data}`, 20, 60);
-
-      doc.save("relatorio-bioai-ctx.pdf");
+    function registrarHistorico(texto) {
+      const historico = document.getElementById("historico");
+      const hora = new Date().toLocaleTimeString();
+      const novo = document.createElement("div");
+      novo.textContent = `🕒 ${hora}: ${texto}`;
+      historico.prepend(novo);
+      if (historico.childElementCount > 3) {
+        historico.removeChild(historico.lastChild);
+      }
     }
-  </script>
-</body>
+
+    function baixarImagem() {
+      html2canvas(document.querySelector(".container")).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'bioai-ctx-result.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    function compartilharWhatsApp() {
+      const texto = document.getElementById("resultado").textContent;
+      const mensagem = encodeURIComponent(`Resultado BioAI‑CTX:\n${texto}`);
+      const numero = '244943589007';
+      window.open(`https://wa.me/${numero}?text=${mensagem}`, '_blank');
+    }
+  </script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script></body>
 </html>
